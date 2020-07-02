@@ -1,0 +1,36 @@
+name: Build Python wheel for Alpine Linux
+
+on:
+  push:
+    branches:
+      - master
+  release:
+    types:
+      - published
+
+jobs:
+
+  build:
+    name: Build Python wheel for Alpine Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v2
+      - name: Log in to the GitHub registry
+        run: docker login --password ${{ github.token }} --username ${{ github.actor }} docker.pkg.github.com
+      - name: Run build script in Alpine container
+        run: docker-compose up build
+      - name: List build artifacts
+        run: ls -hl ${{ github.workspace }}/psycopg2/dist
+      - name: Show sha256 of build artifacts
+        run: shasum -a 256 ${{ github.workspace }}/psycopg2/dist/*
+      - name: Upload wheel as release asset
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          asset_content_type: application/octet-stream
+          asset_path: ${{ github.workspace }}/psycopg2/dist/psycopg2-${{ github.event.release.tag_name }}-cp38-cp38-linux_x86_64.whl
+          asset_name: psycopg2-${{ github.event.release.tag_name }}-cp38-cp38-linux_x86_64.whl
+          upload_url: ${{ github.event.release.upload_url }}
