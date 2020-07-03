@@ -21,9 +21,9 @@ jobs:
       - name: Get file name of asset
         id: asset
         run: echo "::set-output name=filename::$(ls *.whl)"
-      - name: Show sha256 of build artifacts
+      - name: Show sha256 of asset
         run: shasum -a 256 ${{ github.workspace }}/${{ steps.asset.outputs.filename }}
-      - name: Upload wheel as release asset
+      - name: Upload asset to release
         if: github.event_name == 'release'
         uses: actions/upload-release-asset@v1
         env:
