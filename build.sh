@@ -6,4 +6,4 @@ set -e
 apk add --no-cache gcc musl-dev postgresql-dev
 
 # build
-pip wheel --requirement requirements.txt
+pip wheel --no-deps --requirement requirements.txt
